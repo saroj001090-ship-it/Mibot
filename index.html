@@ -2,687 +2,674 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universal AI Chat</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        gray: {
-                            850: '#1f2937',
-                            900: '#111827',
-                            950: '#030712',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mibot — AI Automation for Modern Teams</title>
+    <meta name="description" content="Mibot is a polished AI automation website template for teams that want faster support, smarter workflows, and a delightful customer experience.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Base Resets for Mobile-First App */
-        html, body {
+        :root {
+            --bg: #08111f;
+            --panel: rgba(255, 255, 255, 0.08);
+            --panel-strong: rgba(255, 255, 255, 0.14);
+            --text: #f7fbff;
+            --muted: #a9b7ca;
+            --brand: #67e8f9;
+            --brand-2: #a78bfa;
+            --brand-3: #34d399;
+            --line: rgba(255, 255, 255, 0.14);
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+            --radius: 28px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overscroll-behavior-y: none;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 10% 0%, rgba(103, 232, 249, 0.22), transparent 32rem),
+                radial-gradient(circle at 85% 8%, rgba(167, 139, 250, 0.24), transparent 34rem),
+                linear-gradient(180deg, #08111f 0%, #0c1220 48%, #101827 100%);
+            min-height: 100vh;
         }
 
-        /* Fallback Loader Styles */
-        #loading {
-            position: fixed;
-            inset: 0;
-            background: #ffffff;
-            z-index: 9999;
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img,
+        svg {
+            max-width: 100%;
+        }
+
+        .container {
+            width: min(1120px, calc(100% - 40px));
+            margin: 0 auto;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(18px);
+            background: rgba(8, 17, 31, 0.72);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .nav {
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 1.25rem;
-            font-family: system-ui, -apple-system, sans-serif;
-            color: #374151;
-            transition: opacity 0.3s ease;
-        }
-        html.dark #loading {
-            background: #111827;
-            color: #f3f4f6;
+            justify-content: space-between;
+            min-height: 76px;
+            gap: 24px;
         }
 
-        /* App Container setup */
-        #app {
-            display: none; /* Hidden until JS loads */
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            font-size: 1.35rem;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        html.dark ::-webkit-scrollbar-thumb {
-            background: #475569;
+        .logo-mark {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            box-shadow: 0 12px 32px rgba(103, 232, 249, 0.24);
+            color: #07111f;
         }
 
-        /* Markdown Custom Styles */
-        .markdown-body {
-            font-family: inherit;
-            line-height: 1.6;
-            word-wrap: break-word;
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 0.94rem;
         }
-        .markdown-body p { margin-bottom: 0.75em; }
-        .markdown-body p:last-child { margin-bottom: 0; }
-        .markdown-body pre {
-            background-color: #1e293b;
-            color: #f8fafc;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            margin: 0.75rem 0;
-        }
-        html.dark .markdown-body pre { background-color: #0f172a; border: 1px solid #1e293b; }
-        .markdown-body code {
-            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-            font-size: 0.875em;
-        }
-        .markdown-body :not(pre) > code {
-            background-color: rgba(148, 163, 184, 0.2);
-            padding: 0.15rem 0.3rem;
-            border-radius: 0.25rem;
-        }
-        .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body a { color: #3b82f6; text-decoration: underline; }
 
-        /* Typing Animation */
-        .typing-indicator span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background-color: #9ca3af;
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 13px 20px;
+            font-weight: 800;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button-primary {
+            color: #07111f;
+            background: linear-gradient(135deg, var(--brand), var(--brand-3));
+            box-shadow: 0 18px 42px rgba(52, 211, 153, 0.24);
+        }
+
+        .button-secondary {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--line);
+        }
+
+        .hero {
+            padding: 86px 0 70px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.03fr 0.97fr;
+            align-items: center;
+            gap: 54px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 13px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: #d9faff;
+            background: rgba(103, 232, 249, 0.08);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .pulse {
+            width: 9px;
+            height: 9px;
+            border-radius: 99px;
+            background: var(--brand-3);
+            box-shadow: 0 0 0 8px rgba(52, 211, 153, 0.14);
+        }
+
+        h1 {
+            margin: 24px 0 20px;
+            font-size: clamp(3rem, 7vw, 5.9rem);
+            line-height: 0.91;
+            letter-spacing: -0.08em;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 10%, var(--brand) 48%, var(--brand-2) 92%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-copy {
+            max-width: 650px;
+            margin: 0;
+            color: var(--muted);
+            font-size: clamp(1.06rem, 2vw, 1.25rem);
+            line-height: 1.75;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 34px;
+        }
+
+        .trust-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-top: 34px;
+            color: var(--muted);
+            font-size: 0.94rem;
+            font-weight: 700;
+        }
+
+        .trust-row span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-card {
+            position: relative;
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: calc(var(--radius) + 8px);
+            background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            background: radial-gradient(circle at 25% 0%, rgba(103, 232, 249, 0.22), transparent 22rem);
+            pointer-events: none;
+        }
+
+        .browser-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 0 0 16px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            margin: 0 2px;
-            animation: bounce 1.4s infinite ease-in-out both;
+            background: #fb7185;
         }
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+
+        .dot:nth-child(2) { background: #fbbf24; }
+        .dot:nth-child(3) { background: #34d399; }
+
+        .bot-panel {
+            position: relative;
+            display: grid;
+            gap: 16px;
+        }
+
+        .message {
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: rgba(7, 17, 31, 0.72);
+        }
+
+        .message small {
+            display: block;
+            color: var(--brand);
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .workflow {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .workflow-card {
+            padding: 16px;
+            min-height: 118px;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .workflow-card b {
+            display: block;
+            margin: 12px 0 5px;
+        }
+
+        .workflow-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.86rem;
+            line-height: 1.5;
+        }
+
+        section {
+            padding: 78px 0;
+        }
+
+        .section-heading {
+            max-width: 760px;
+            margin-bottom: 36px;
+        }
+
+        .section-heading h2 {
+            margin: 0 0 14px;
+            font-size: clamp(2.2rem, 4vw, 3.55rem);
+            line-height: 1;
+            letter-spacing: -0.06em;
+        }
+
+        .section-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1.08rem;
+            line-height: 1.7;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .feature-card,
+        .pricing-card,
+        .testimonial-card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--panel);
+            padding: 26px;
+            box-shadow: 0 18px 60px rgba(0,0,0,0.16);
+        }
+
+        .icon {
+            display: grid;
+            place-items: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(103, 232, 249, 0.22), rgba(167, 139, 250, 0.18));
+            color: var(--brand);
+            font-size: 1.45rem;
+        }
+
+        .feature-card h3,
+        .pricing-card h3 {
+            margin: 22px 0 10px;
+            font-size: 1.2rem;
+        }
+
+        .feature-card p,
+        .pricing-card p,
+        .testimonial-card p {
+            color: var(--muted);
+            line-height: 1.65;
+            margin: 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 22px;
+        }
+
+        .stat {
+            padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            background: rgba(255,255,255,0.07);
+        }
+
+        .stat b {
+            display: block;
+            font-size: 2rem;
+            letter-spacing: -0.05em;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 20px;
+        }
+
+        .pricing-card.featured {
+            background: linear-gradient(135deg, rgba(103,232,249,0.16), rgba(167,139,250,0.16));
+            border-color: rgba(103, 232, 249, 0.38);
+        }
+
+        .price {
+            display: flex;
+            align-items: end;
+            gap: 6px;
+            margin: 18px 0;
+        }
+
+        .price strong {
+            font-size: 3rem;
+            letter-spacing: -0.06em;
+        }
+
+        .list {
+            display: grid;
+            gap: 12px;
+            padding: 0;
+            margin: 22px 0 0;
+            list-style: none;
+            color: #dce7f5;
+        }
+
+        .list li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .cta {
+            text-align: center;
+            border: 1px solid rgba(103, 232, 249, 0.22);
+            border-radius: 36px;
+            padding: 56px 28px;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(103,232,249,0.18), transparent 30rem),
+                rgba(255, 255, 255, 0.08);
+        }
+
+        .cta h2 {
+            margin: 0 auto 16px;
+            max-width: 720px;
+            font-size: clamp(2.15rem, 5vw, 4.2rem);
+            line-height: 0.98;
+            letter-spacing: -0.07em;
+        }
+
+        .cta p {
+            margin: 0 auto 28px;
+            max-width: 640px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        footer {
+            padding: 34px 0 44px;
+            color: var(--muted);
+        }
+
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            border-top: 1px solid var(--line);
+            padding-top: 24px;
+        }
+
+        @media (max-width: 860px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding-top: 58px;
+            }
+
+            .hero-grid,
+            .feature-grid,
+            .pricing-grid,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-card {
+                padding: 14px;
+            }
+
+            .workflow {
+                grid-template-columns: 1fr;
+            }
+
+            section {
+                padding: 56px 0;
+            }
+
+            .footer-row {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-colors duration-200">
-
-    <div id="loading">
-        <div class="flex flex-col items-center gap-4">
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
-            <div>Loading App...</div>
-        </div>
-    </div>
-
-    <div id="app" class="flex min-h-[100dvh] w-full relative">
-        
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
-
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-gray-50 dark:bg-gray-850 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 flex flex-col h-[100dvh]">
-            <div class="p-4 flex items-center justify-between">
-                <button id="btn-new-chat" class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-sm text-sm font-medium">
-                    <i class="fa-solid fa-plus"></i> New Chat
-                </button>
-                <button id="btn-close-sidebar" class="md:hidden ml-2 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+<body>
+    <header class="site-header">
+        <nav class="container nav" aria-label="Primary navigation">
+            <a class="logo" href="#top" aria-label="Mibot home">
+                <span class="logo-mark" aria-hidden="true">✦</span>
+                <span>Mibot</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#results">Results</a>
+                <a href="#pricing">Pricing</a>
             </div>
-            
-            <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1" id="chat-list">
-                </div>
+            <a class="button button-secondary" href="#contact">Book a demo</a>
+        </nav>
+    </header>
 
-            <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
-                <button id="btn-theme" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-sm font-medium transition-colors">
-                    <i class="fa-solid fa-moon w-5 text-center" id="theme-icon"></i>
-                    <span id="theme-text">Dark Mode</span>
-                </button>
-                <button id="btn-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-sm font-medium transition-colors">
-                    <i class="fa-solid fa-gear w-5 text-center"></i>
-                    <span>Settings</span>
-                </button>
-            </div>
-        </aside>
-
-        <main class="flex-1 flex flex-col min-w-0 h-[100dvh] relative bg-white dark:bg-gray-900">
-            <header class="flex items-center justify-between p-4 sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-10 border-b border-transparent">
-                <div class="flex items-center gap-3">
-                    <button id="btn-menu" class="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
-                    <h1 class="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Universal AI</h1>
-                </div>
-                <div class="text-xs font-medium px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md text-gray-500" id="current-model-display">
-                    deepseek-r1:free
-                </div>
-            </header>
-
-            <div id="messages-container" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-6 pb-40 scroll-smooth">
-                </div>
-
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent dark:from-gray-900 dark:via-gray-900 pt-8 pb-4 px-4 md:px-8 z-20">
-                <div class="max-w-4xl mx-auto relative">
-                    <form id="chat-form" class="relative flex items-end gap-2 bg-gray-50 dark:bg-gray-850 rounded-[1.5rem] p-2 border border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 shadow-sm transition-all">
-                        <textarea id="message-input" rows="1" class="w-full max-h-48 resize-none bg-transparent border-none outline-none py-3 px-4 text-gray-800 dark:text-gray-100 placeholder-gray-500" placeholder="Message AI..."></textarea>
-                        <button type="submit" id="btn-send" class="p-3 m-1 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 flex items-center justify-center w-12 h-12 shadow-md">
-                            <i class="fa-solid fa-arrow-up text-lg"></i>
-                        </button>
-                    </form>
-                    <div class="text-center mt-2 text-xs text-gray-400 dark:text-gray-500 px-4">
-                        AI can make mistakes. Verify critical information.
+    <main id="top">
+        <section class="hero">
+            <div class="container hero-grid">
+                <div>
+                    <span class="eyebrow"><span class="pulse"></span> AI assistant live in under 10 minutes</span>
+                    <h1>Launch your <span class="gradient-text">smart AI website</span> without the busywork.</h1>
+                    <p class="hero-copy">Mibot gives your business a premium web presence with built-in automation, lead capture, instant support, and workflow-ready AI experiences that feel polished from the first click.</p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="#contact">Start building</a>
+                        <a class="button button-secondary" href="#features">Explore features</a>
+                    </div>
+                    <div class="trust-row" aria-label="Trust indicators">
+                        <span>✓ No-code setup</span>
+                        <span>✓ Mobile-first design</span>
+                        <span>✓ Secure by default</span>
                     </div>
                 </div>
-            </div>
-        </main>
-    </div>
 
-    <div id="modal-settings" class="fixed inset-0 z-[100] hidden items-center justify-center">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="modal-backdrop"></div>
-        <div class="relative bg-white dark:bg-gray-850 rounded-2xl shadow-2xl w-11/12 max-w-lg p-6 border border-gray-200 dark:border-gray-700 flex flex-col gap-5 transform scale-95 transition-transform duration-200" id="modal-content">
-            <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 pb-3">
-                <h2 class="text-xl font-semibold">Settings</h2>
-                <button id="btn-close-modal-x" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">OpenRouter API Key <span class="text-red-500">*</span></label>
-                    <input type="password" id="input-api-key" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-shadow" placeholder="sk-or-v1-...">
-                    <p class="text-xs text-gray-500 mt-1">Stored locally in your browser.</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Model Name</label>
-                    <input type="text" id="input-model" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-shadow" value="deepseek/deepseek-r1:free">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Global System Prompt</label>
-                    <textarea id="input-system" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none h-24 transition-shadow" placeholder="You are a helpful, brilliant AI assistant..."></textarea>
-                </div>
-            </div>
-            
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                <button id="btn-close-settings" class="px-5 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 font-medium text-gray-700 dark:text-gray-300 transition-colors">Cancel</button>
-                <button id="btn-save-settings" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow-md transition-colors">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // --- DEPENDENCY CONFIGURATION ---
-            marked.setOptions({ breaks: true, gfm: true });
-
-            // --- STATE MANAGEMENT ---
-            const defaultSettings = {
-                apiKey: '',
-                model: 'deepseek/deepseek-r1:free',
-                systemPrompt: 'You are a helpful, smart, and concise AI assistant.',
-                theme: 'light'
-            };
-
-            let settings = { ...defaultSettings };
-            let chats = [];
-            let currentChatId = null;
-            let isGenerating = false;
-
-            // --- DOM ELEMENTS ---
-            const els = {
-                app: document.getElementById('app'),
-                loading: document.getElementById('loading'),
-                sidebar: document.getElementById('sidebar'),
-                sidebarOverlay: document.getElementById('sidebar-overlay'),
-                chatList: document.getElementById('chat-list'),
-                messagesContainer: document.getElementById('messages-container'),
-                chatForm: document.getElementById('chat-form'),
-                messageInput: document.getElementById('message-input'),
-                btnSend: document.getElementById('btn-send'),
-                btnNewChat: document.getElementById('btn-new-chat'),
-                btnMenu: document.getElementById('btn-menu'),
-                btnCloseSidebar: document.getElementById('btn-close-sidebar'),
-                btnTheme: document.getElementById('btn-theme'),
-                themeIcon: document.getElementById('theme-icon'),
-                themeText: document.getElementById('theme-text'),
-                btnSettings: document.getElementById('btn-settings'),
-                modalSettings: document.getElementById('modal-settings'),
-                modalContent: document.getElementById('modal-content'),
-                modalBackdrop: document.getElementById('modal-backdrop'),
-                btnCloseSettings: document.getElementById('btn-close-settings'),
-                btnCloseModalX: document.getElementById('btn-close-modal-x'),
-                btnSaveSettings: document.getElementById('btn-save-settings'),
-                inputApiKey: document.getElementById('input-api-key'),
-                inputModel: document.getElementById('input-model'),
-                inputSystem: document.getElementById('input-system'),
-                currentModelDisplay: document.getElementById('current-model-display')
-            };
-
-            // --- INITIALIZATION ---
-            function init() {
-                loadData();
-                applyTheme(settings.theme);
-                renderSidebar();
-                
-                if (chats.length > 0) {
-                    selectChat(chats[0].id);
-                } else {
-                    renderMessages(); // Shows welcome screen
-                }
-
-                setupEventListeners();
-
-                // Hide loader and show app safely
-                els.loading.style.opacity = '0';
-                setTimeout(() => {
-                    els.loading.style.display = 'none';
-                    els.app.style.display = 'flex';
-                }, 300);
-            }
-
-            // --- LOCAL STORAGE ---
-            function loadData() {
-                try {
-                    const savedSettings = localStorage.getItem('ai_settings');
-                    if (savedSettings) settings = { ...settings, ...JSON.parse(savedSettings) };
-                    
-                    const savedChats = localStorage.getItem('ai_chats');
-                    if (savedChats) chats = JSON.parse(savedChats);
-                } catch (e) {
-                    console.error("Error loading data", e);
-                }
-                els.currentModelDisplay.innerText = settings.model.split('/').pop();
-            }
-
-            function saveData() {
-                try {
-                    localStorage.setItem('ai_settings', JSON.stringify(settings));
-                    localStorage.setItem('ai_chats', JSON.stringify(chats));
-                } catch (e) {
-                    console.error("Error saving data", e);
-                }
-            }
-
-            // --- THEME MANAGEMENT ---
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    els.themeIcon.classList.replace('fa-moon', 'fa-sun');
-                    els.themeText.innerText = 'Light Mode';
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    els.themeIcon.classList.replace('fa-sun', 'fa-moon');
-                    els.themeText.innerText = 'Dark Mode';
-                }
-            }
-
-            function toggleTheme() {
-                settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
-                applyTheme(settings.theme);
-                saveData();
-            }
-
-            // --- UI RENDERING ---
-            function renderSidebar() {
-                els.chatList.innerHTML = '';
-                chats.forEach(chat => {
-                    const isActive = chat.id === currentChatId;
-                    const div = document.createElement('div');
-                    div.className = `group relative flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-medium transition-colors ${
-                        isActive 
-                        ? 'bg-blue-100 dark:bg-gray-800 text-blue-700 dark:text-blue-400' 
-                        : 'hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
-                    }`;
-                    
-                    const titleSpan = document.createElement('span');
-                    titleSpan.className = 'flex-1 truncate';
-                    titleSpan.textContent = chat.title || 'New Chat';
-                    div.onclick = () => selectChat(chat.id);
-
-                    const actionsDiv = document.createElement('div');
-                    actionsDiv.className = `flex items-center opacity-0 group-hover:opacity-100 transition-opacity ${isActive ? 'opacity-100' : ''}`;
-                    
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'p-1.5 hover:text-blue-500 transition-colors';
-                    editBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
-                    editBtn.onclick = (e) => { e.stopPropagation(); renameChat(chat.id); };
-
-                    const delBtn = document.createElement('button');
-                    delBtn.className = 'p-1.5 hover:text-red-500 transition-colors ml-1';
-                    delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
-                    delBtn.onclick = (e) => { e.stopPropagation(); deleteChat(chat.id); };
-
-                    actionsDiv.appendChild(editBtn);
-                    actionsDiv.appendChild(delBtn);
-
-                    div.appendChild(titleSpan);
-                    div.appendChild(actionsDiv);
-                    els.chatList.appendChild(div);
-                });
-            }
-
-            function renderMessages() {
-                els.messagesContainer.innerHTML = '';
-                const activeChat = chats.find(c => c.id === currentChatId);
-
-                if (!activeChat || activeChat.messages.length === 0) {
-                    els.messagesContainer.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-full text-center space-y-6 mt-10 md:mt-24 max-w-2xl mx-auto px-4">
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 transform hover:scale-105 transition-transform">
-                                <i class="fa-solid fa-sparkles text-white text-2xl"></i>
-                            </div>
-                            <h2 class="text-3xl font-semibold bg-gradient-to-r from-gray-800 to-gray-500 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">How can I help you today?</h2>
-                            <p class="text-gray-500 dark:text-gray-400">Enter a message below to start chatting with ${settings.model.split('/').pop()}.</p>
+                <div class="dashboard-card" aria-label="Mibot product preview">
+                    <div class="browser-bar" aria-hidden="true">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <div class="bot-panel">
+                        <div class="message">
+                            <small>Mibot Assistant</small>
+                            <strong>Hi! I can qualify leads, answer product questions, and route urgent requests to your team.</strong>
                         </div>
-                    `;
-                    return;
-                }
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'max-w-3xl w-full mx-auto flex flex-col gap-6';
-
-                activeChat.messages.forEach(msg => {
-                    if (msg.role === 'system') return; // Hide system messages
-
-                    const msgDiv = document.createElement('div');
-                    if (msg.role === 'user') {
-                        msgDiv.className = 'self-end bg-blue-100 dark:bg-blue-900/50 text-gray-900 dark:text-gray-100 px-5 py-3.5 rounded-3xl rounded-br-sm max-w-[85%] md:max-w-[75%] break-words shadow-sm';
-                        msgDiv.textContent = msg.content;
-                    } else {
-                        msgDiv.className = 'self-start w-full flex gap-4 max-w-full';
-                        msgDiv.innerHTML = `
-                            <div class="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center mt-1 shadow-sm">
-                                <i class="fa-solid fa-sparkles text-white text-xs"></i>
-                            </div>
-                            <div class="flex-1 min-w-0 markdown-body text-gray-800 dark:text-gray-200 pt-1">
-                                ${DOMPurify.sanitize(marked.parse(msg.content))}
-                            </div>
-                        `;
-                    }
-                    wrapper.appendChild(msgDiv);
-                });
-                
-                els.messagesContainer.appendChild(wrapper);
-                scrollToBottom();
-            }
-
-            function scrollToBottom() {
-                els.messagesContainer.scrollTop = els.messagesContainer.scrollHeight;
-            }
-
-            // --- CHAT MANAGEMENT ---
-            function createNewChat() {
-                if (isGenerating) return;
-                const newChat = {
-                    id: Date.now().toString(),
-                    title: 'New Chat',
-                    messages: [],
-                    systemPrompt: settings.systemPrompt
-                };
-                chats.unshift(newChat);
-                currentChatId = newChat.id;
-                saveData();
-                renderSidebar();
-                renderMessages();
-                closeSidebarMobile();
-                els.messageInput.focus();
-            }
-
-            function selectChat(id) {
-                if (isGenerating) return;
-                currentChatId = id;
-                renderSidebar();
-                renderMessages();
-                closeSidebarMobile();
-            }
-
-            function deleteChat(id) {
-                if (isGenerating) return;
-                if (!confirm("Are you sure you want to delete this chat?")) return;
-                chats = chats.filter(c => c.id !== id);
-                if (currentChatId === id) {
-                    currentChatId = chats.length > 0 ? chats[0].id : null;
-                }
-                saveData();
-                renderSidebar();
-                renderMessages();
-            }
-
-            function renameChat(id) {
-                const chat = chats.find(c => c.id === id);
-                if (!chat) return;
-                const newTitle = prompt("Enter new title:", chat.title);
-                if (newTitle && newTitle.trim()) {
-                    chat.title = newTitle.trim();
-                    saveData();
-                    renderSidebar();
-                }
-            }
-
-            // --- MOBILE SIDEBAR ---
-            function openSidebarMobile() {
-                els.sidebar.classList.remove('-translate-x-full');
-                els.sidebarOverlay.classList.remove('hidden');
-            }
-
-            function closeSidebarMobile() {
-                els.sidebar.classList.add('-translate-x-full');
-                els.sidebarOverlay.classList.add('hidden');
-            }
-
-            // --- MODAL SETTINGS ---
-            function openSettings() {
-                els.inputApiKey.value = settings.apiKey;
-                els.inputModel.value = settings.model;
-                els.inputSystem.value = settings.systemPrompt;
-                els.modalSettings.classList.remove('hidden');
-                els.modalSettings.classList.add('flex');
-                setTimeout(() => els.modalContent.classList.replace('scale-95', 'scale-100'), 10);
-            }
-
-            function closeSettings() {
-                els.modalContent.classList.replace('scale-100', 'scale-95');
-                setTimeout(() => {
-                    els.modalSettings.classList.add('hidden');
-                    els.modalSettings.classList.remove('flex');
-                }, 200);
-            }
-
-            function saveSettings() {
-                settings.apiKey = els.inputApiKey.value.trim();
-                settings.model = els.inputModel.value.trim() || 'deepseek/deepseek-r1:free';
-                settings.systemPrompt = els.inputSystem.value.trim();
-                els.currentModelDisplay.innerText = settings.model.split('/').pop();
-                saveData();
-                closeSettings();
-            }
-
-            // --- AUTO-RESIZE TEXTAREA ---
-            function resizeTextarea() {
-                els.messageInput.style.height = 'auto';
-                els.messageInput.style.height = Math.min(els.messageInput.scrollHeight, 192) + 'px'; // 192px = max-h-48
-            }
-
-            // --- API INTEGRATION & STREAMING ---
-            async function sendMessage(e) {
-                if (e) e.preventDefault();
-                if (isGenerating) return;
-
-                const text = els.messageInput.value.trim();
-                if (!text) return;
-
-                if (!settings.apiKey) {
-                    alert("Please set your OpenRouter API Key in Settings first.");
-                    openSettings();
-                    return;
-                }
-
-                // Create chat if none exists
-                if (!currentChatId || chats.length === 0) {
-                    createNewChat();
-                }
-
-                const chat = chats.find(c => c.id === currentChatId);
-                if (!chat) return;
-
-                // Auto-generate title for first message
-                if (chat.messages.length === 0) {
-                    chat.title = text.length > 30 ? text.substring(0, 30) + '...' : text;
-                    renderSidebar();
-                }
-
-                // Add User Message
-                chat.messages.push({ role: 'user', content: text });
-                
-                // Reset Input UI
-                els.messageInput.value = '';
-                els.messageInput.style.height = 'auto';
-                els.btnSend.disabled = true;
-                isGenerating = true;
-                saveData();
-                renderMessages();
-
-                // Create placeholder for AI message
-                const wrapper = els.messagesContainer.querySelector('.max-w-3xl') || document.createElement('div');
-                if (!els.messagesContainer.contains(wrapper)) {
-                    wrapper.className = 'max-w-3xl w-full mx-auto flex flex-col gap-6';
-                    els.messagesContainer.innerHTML = '';
-                    els.messagesContainer.appendChild(wrapper);
-                }
-
-                const aiMsgDiv = document.createElement('div');
-                aiMsgDiv.className = 'self-start w-full flex gap-4 max-w-full';
-                aiMsgDiv.innerHTML = `
-                    <div class="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center mt-1 shadow-sm">
-                        <i class="fa-solid fa-sparkles text-white text-xs"></i>
+                        <div class="workflow">
+                            <article class="workflow-card">
+                                <span class="icon">⚡</span>
+                                <b>Capture</b>
+                                <p>Turn visitors into structured leads automatically.</p>
+                            </article>
+                            <article class="workflow-card">
+                                <span class="icon">💬</span>
+                                <b>Support</b>
+                                <p>Reply instantly with brand-safe answers.</p>
+                            </article>
+                            <article class="workflow-card">
+                                <span class="icon">📈</span>
+                                <b>Grow</b>
+                                <p>Reveal conversion insights and next actions.</p>
+                            </article>
+                        </div>
+                        <div class="message">
+                            <small>Automation summary</small>
+                            <strong>12 new qualified leads, 86% resolved conversations, 4 urgent handoffs.</strong>
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0 markdown-body text-gray-800 dark:text-gray-200 pt-1" id="stream-content">
-                        <div class="typing-indicator mt-2"><span></span><span></span><span></span></div>
-                    </div>
-                `;
-                wrapper.appendChild(aiMsgDiv);
-                scrollToBottom();
+                </div>
+            </div>
+        </section>
 
-                const streamContent = aiMsgDiv.querySelector('#stream-content');
-                let aiResponseText = "";
+        <section id="features">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Everything your AI-powered website needs.</h2>
+                    <p>Present your brand beautifully, help customers instantly, and keep every interaction organized for follow-up.</p>
+                </div>
+                <div class="feature-grid">
+                    <article class="feature-card">
+                        <span class="icon">🎯</span>
+                        <h3>Conversion-focused landing page</h3>
+                        <p>A clear hero, benefit sections, social proof, and strong calls to action guide visitors toward booking or buying.</p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="icon">🤖</span>
+                        <h3>AI-ready positioning</h3>
+                        <p>Messaging is written for an intelligent assistant product, but flexible enough for agencies, SaaS, and service brands.</p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="icon">📱</span>
+                        <h3>Responsive by default</h3>
+                        <p>The layout adapts cleanly from large desktop displays to mobile screens with fast, accessible interactions.</p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="icon">🔐</span>
+                        <h3>Trust-building details</h3>
+                        <p>Security, reliability, and handoff messaging help customers feel confident before they share their information.</p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="icon">🧩</span>
+                        <h3>Simple to customize</h3>
+                        <p>All content and styling live in one HTML file, making it easy to adjust copy, colors, pricing, and sections.</p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="icon">🚀</span>
+                        <h3>Launch-ready polish</h3>
+                        <p>Glassmorphism panels, gradients, cards, and modern typography give the page a premium product feel.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
 
-                // Prepare Payload
-                const payloadMessages = [];
-                if (chat.systemPrompt) {
-                    payloadMessages.push({ role: 'system', content: chat.systemPrompt });
-                }
-                payloadMessages.push(...chat.messages);
+        <section id="results">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Designed to turn attention into action.</h2>
+                    <p>Use Mibot as a high-impact homepage for your AI service, bot product, or automation agency.</p>
+                </div>
+                <div class="stats">
+                    <div class="stat"><b>24/7</b><span>visitor support</span></div>
+                    <div class="stat"><b>3x</b><span>faster lead routing</span></div>
+                    <div class="stat"><b>86%</b><span>self-serve answers</span></div>
+                    <div class="stat"><b>10m</b><span>setup target</span></div>
+                </div>
+            </div>
+        </section>
 
-                try {
-                    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${settings.apiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: settings.model,
-                            messages: payloadMessages,
-                            stream: true
-                        })
-                    });
+        <section id="pricing">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Pick a launch path.</h2>
+                    <p>Start with the page as-is, then connect your preferred forms, analytics, chat tools, or backend services.</p>
+                </div>
+                <div class="pricing-grid">
+                    <article class="pricing-card">
+                        <h3>Starter</h3>
+                        <p>For validating a polished AI business presence quickly.</p>
+                        <div class="price"><strong>$0</strong><span>/ template</span></div>
+                        <a class="button button-secondary" href="#contact">Use template</a>
+                        <ul class="list">
+                            <li>✓ One-page responsive website</li>
+                            <li>✓ Modern product copy</li>
+                            <li>✓ Easy visual customization</li>
+                        </ul>
+                    </article>
+                    <article class="pricing-card featured">
+                        <h3>Growth</h3>
+                        <p>For teams ready to connect automations and turn the website into a working sales assistant.</p>
+                        <div class="price"><strong>Custom</strong><span>/ build</span></div>
+                        <a class="button button-primary" href="#contact">Plan my build</a>
+                        <ul class="list">
+                            <li>✓ Lead forms and CRM handoff</li>
+                            <li>✓ AI chat or support integration</li>
+                            <li>✓ Analytics events and conversion tracking</li>
+                            <li>✓ Brand-specific design refinement</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
 
-                    if (!response.ok) {
-                        const err = await response.json();
-                        throw new Error(err.error?.message || `HTTP Error ${response.status}`);
-                    }
+        <section id="contact">
+            <div class="container">
+                <div class="cta">
+                    <h2>Ready to make your website feel intelligent?</h2>
+                    <p>Replace this section with your booking link, form provider, or email address and start collecting high-intent conversations today.</p>
+                    <a class="button button-primary" href="mailto:hello@example.com">Contact the team</a>
+                </div>
+            </div>
+        </section>
+    </main>
 
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder("utf-8");
-                    let buffer = "";
-
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-                        
-                        buffer += decoder.decode(value, { stream: true });
-                        const lines = buffer.split('\n');
-                        buffer = lines.pop(); // Keep incomplete line in buffer
-
-                        for (const line of lines) {
-                            const trimmed = line.trim();
-                            if (!trimmed || trimmed === 'data: [DONE]') continue;
-                            
-                            if (trimmed.startsWith('data:')) {
-                                try {
-                                    const jsonStr = trimmed.slice(5).trim();
-                                    const data = JSON.parse(jsonStr);
-                                    if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
-                                        aiResponseText += data.choices[0].delta.content;
-                                        streamContent.innerHTML = DOMPurify.sanitize(marked.parse(aiResponseText));
-                                        scrollToBottom();
-                                    }
-                                } catch (e) {
-                                    // Soft fail for chunk parse errors
-                                    console.warn("SSE Parse Error", e);
-                                }
-                            }
-                        }
-                    }
-
-                } catch (error) {
-                    aiResponseText = `**Error:** ${error.message}`;
-                    streamContent.innerHTML = DOMPurify.sanitize(marked.parse(aiResponseText));
-                    streamContent.classList.add('text-red-500');
-                } finally {
-                    chat.messages.push({ role: 'assistant', content: aiResponseText });
-                    saveData();
-                    isGenerating = false;
-                    els.btnSend.disabled = false;
-                    els.messageInput.focus();
-                }
-            }
-
-            // --- EVENT LISTENERS ---
-            function setupEventListeners() {
-                els.btnTheme.addEventListener('click', toggleTheme);
-                els.btnNewChat.addEventListener('click', createNewChat);
-                els.btnMenu.addEventListener('click', openSidebarMobile);
-                els.btnCloseSidebar.addEventListener('click', closeSidebarMobile);
-                els.sidebarOverlay.addEventListener('click', closeSidebarMobile);
-                
-                // Settings Modal
-                els.btnSettings.addEventListener('click', openSettings);
-                els.btnCloseSettings.addEventListener('click', closeSettings);
-                els.btnCloseModalX.addEventListener('click', closeSettings);
-                els.modalBackdrop.addEventListener('click', closeSettings);
-                els.btnSaveSettings.addEventListener('click', saveSettings);
-
-                // Input handling
-                els.messageInput.addEventListener('input', resizeTextarea);
-                els.messageInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-                els.chatForm.addEventListener('submit', sendMessage);
-            }
-
-            // START APP
-            init();
-        });
-    </script>
+    <footer>
+        <div class="container footer-row">
+            <span>© 2026 Mibot. All rights reserved.</span>
+            <span>Built for fast AI product launches.</span>
+        </div>
+    </footer>
 </body>
 </html>
