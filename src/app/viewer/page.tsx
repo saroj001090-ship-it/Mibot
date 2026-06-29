@@ -1,3 +1,22 @@
-import { FileDropzone } from '@/components/upload/FileDropzone';
-export const metadata={title:'PDF Viewer',description:'Fast browser PDF viewer with thumbnails, zoom, rotate, search, dark mode, print, and share.'};
-export default function Page(){return <div className="container-page py-12"><span className="badge">Free forever • Privacy-first</span><h1 className="mt-4 text-5xl font-black">PDF Viewer</h1><p className="mt-4 max-w-3xl text-lg text-slate-600 dark:text-slate-300">Fast browser PDF viewer with thumbnails, zoom, rotate, search, dark mode, print, and share.</p><div className="mt-8 grid gap-6 lg:grid-cols-2"><div className="card p-6"><h2 className="text-2xl font-bold">Production foundation</h2><ul className="mt-4 list-disc space-y-2 pl-5 text-slate-600 dark:text-slate-300"><li>No paid plans, subscriptions, checkout, or locked tools.</li><li>Guest mode works for all main PDF tools.</li><li>Cloud processing requires explicit consent.</li><li>Temporary server files are designed for auto deletion.</li></ul></div><FileDropzone/></div></div>}
+import { PdfViewerShell } from '@/components/pdf-viewer/PdfViewerShell';
+
+export const metadata = {
+  title: 'PDF Viewer',
+  description: 'Fast browser PDF viewer with thumbnails, zoom, rotate, search, dark mode, print, and share.',
+};
+
+export default function Page() {
+  return (
+    <div className="container-page py-12">
+      <span className="badge">Browser-first PDF viewer</span>
+      <h1 className="mt-4 text-5xl font-black">PDF Viewer</h1>
+      <p className="mt-4 max-w-3xl text-lg text-slate-600 dark:text-slate-300">
+        Preview PDF files locally with a performance-focused interface designed for lazy page rendering, keyboard shortcuts, thumbnails,
+        search, zoom, print, and mobile gestures.
+      </p>
+      <div className="mt-8">
+        <PdfViewerShell />
+      </div>
+    </div>
+  );
+}

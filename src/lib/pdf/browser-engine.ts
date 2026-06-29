@@ -1,19 +1,171 @@
 'use client';
+
 import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import type { PdfCompressEngine, PdfConvertEngine, PdfMergeEngine, PdfMetadataEngine, PdfSplitEngine, ToolResult } from './types';
-const pdfMime='application/pdf';
-const asBytes=async(file:File)=>new Uint8Array(await file.arrayBuffer());
-const name=(file:File,suffix:string)=>file.name.replace(/\.[^.]+$/, '')+suffix;
-export class BrowserPdfEngine implements PdfMergeEngine,PdfSplitEngine,PdfCompressEngine,PdfConvertEngine,PdfMetadataEngine{
- async merge(files:File[]):Promise<ToolResult>{const out=await PDFDocument.create();for(const f of files){const src=await PDFDocument.load(await asBytes(f),{ignoreEncryption:true});const pages=await out.copyPages(src,src.getPageIndices());pages.forEach(p=>out.addPage(p));} return {name:'merged-docuflux.pdf',bytes:await out.save(),mime:pdfMime};}
- async split(file:File,ranges:string):Promise<ToolResult[]>{const src=await PDFDocument.load(await asBytes(file),{ignoreEncryption:true});const total=src.getPageCount();const groups=ranges.split(',').map(x=>x.trim()).filter(Boolean);const results:ToolResult[]=[];for(const g of groups){const [a,b]=g.split('-').map(n=>Number(n));const start=Math.max(1,a||1),end=Math.min(total,b||a||total);const out=await PDFDocument.create();const pages=await out.copyPages(src,Array.from({length:end-start+1},(_,i)=>start+i-1));pages.forEach(p=>out.addPage(p));results.push({name:name(file,`-pages-${start}-${end}.pdf`),bytes:await out.save(),mime:pdfMime});}return results;}
- async removePages(file:File,pages:number[]):Promise<ToolResult>{const src=await PDFDocument.load(await asBytes(file),{ignoreEncryption:true});const keep=src.getPageIndices().filter(i=>!pages.includes(i+1));const out=await PDFDocument.create();(await out.copyPages(src,keep)).forEach(p=>out.addPage(p));return {name:name(file,'-removed-pages.pdf'),bytes:await out.save(),mime:pdfMime};}
- async rotatePages(file:File,pages:number[],deg:number):Promise<ToolResult>{const doc=await PDFDocument.load(await asBytes(file),{ignoreEncryption:true});doc.getPages().forEach((p,i)=>{if(!pages.length||pages.includes(i+1))p.setRotation(degrees(deg));});return {name:name(file,'-rotated.pdf'),bytes:await doc.save(),mime:pdfMime};}
- async compress(file:File,options:{targetMb?:number;quality:number;preset:string}){const bytes=await asBytes(file);const doc=await PDFDocument.load(bytes,{ignoreEncryption:true});doc.setProducer('DocuFlux PDF browser engine');doc.setCreator('DocuFlux PDF');const saved=await doc.save({useObjectStreams:true,addDefaultPage:false});const target=(options.targetMb||0)*1024*1024;return {name:name(file,'-compressed.pdf'),bytes:saved,mime:pdfMime,originalSize:file.size,finalSize:saved.byteLength,message:target&&file.size<target?'This PDF is already under your selected size. Browser compression optimized metadata/resources where possible.':undefined};}
- async imagesToPdf(files:File[]):Promise<ToolResult>{const doc=await PDFDocument.create();for(const f of files){const bytes=await asBytes(f);const img=f.type.includes('png')?await doc.embedPng(bytes):await doc.embedJpg(bytes);const page=doc.addPage([img.width,img.height]);page.drawImage(img,{x:0,y:0,width:img.width,height:img.height});}return {name:'images-docuflux.pdf',bytes:await doc.save(),mime:pdfMime};}
- async pdfToImages(){throw new Error('PDF to image uses the lazy pdf.js renderer in the browser viewer.');}
- async textToPdf(file:File):Promise<ToolResult>{const doc=await PDFDocument.create();const font=await doc.embedFont(StandardFonts.Helvetica);const text=await file.text();let page=doc.addPage();let y=760;for(const line of text.split('\n')){if(y<48){page=doc.addPage();y=760}page.drawText(line.slice(0,100),{x:48,y,size:11,font,color:rgb(.05,.09,.16)});y-=16}return {name:name(file,'.pdf'),bytes:await doc.save(),mime:pdfMime};}
- async read(file:File){const doc=await PDFDocument.load(await asBytes(file),{ignoreEncryption:true});return {title:doc.getTitle()||'',author:doc.getAuthor()||'',pageCount:doc.getPageCount(),fileSize:file.size,encrypted:false};}
- async update(file:File,metadata:Record<string,string>){const doc=await PDFDocument.load(await asBytes(file),{ignoreEncryption:true});if(metadata.title)doc.setTitle(metadata.title);if(metadata.author)doc.setAuthor(metadata.author);return {name:name(file,'-metadata.pdf'),bytes:await doc.save(),mime:pdfMime};}
+import type {
+  PdfCompressEngine,
+  PdfConvertEngine,
+  PdfMergeEngine,
+  PdfMetadataEngine,
+  PdfSplitEngine,
+  ToolResult,
+} from './types';
+
+const pdfMime = 'application/pdf';
+const bytesFromFile = async (file: File) => new Uint8Array(await file.arrayBuffer());
+const withSuffix = (file: File, suffix: string) => file.name.replace(/\.[^.]+$/, '') + suffix;
+
+function pageRangeToIndexes(range: string, totalPages: number) {
+  const indexes = new Set<number>();
+
+  for (const rawPart of range.split(',')) {
+    const part = rawPart.trim();
+    if (!part) continue;
+
+    const [startText, endText] = part.split('-');
+    const start = Math.max(1, Number(startText) || 1);
+    const end = Math.min(totalPages, Number(endText) || start);
+
+    for (let page = start; page <= end; page += 1) indexes.add(page - 1);
+  }
+
+  return [...indexes].sort((left, right) => left - right);
 }
-export const browserPdfEngine=new BrowserPdfEngine();
+
+export class BrowserPdfEngine
+  implements PdfMergeEngine, PdfSplitEngine, PdfCompressEngine, PdfConvertEngine, PdfMetadataEngine
+{
+  async merge(files: File[]): Promise<ToolResult> {
+    const outputDocument = await PDFDocument.create();
+
+    for (const file of files) {
+      const sourceDocument = await PDFDocument.load(await bytesFromFile(file), { ignoreEncryption: true });
+      const copiedPages = await outputDocument.copyPages(sourceDocument, sourceDocument.getPageIndices());
+      copiedPages.forEach((page) => outputDocument.addPage(page));
+    }
+
+    return { name: 'merged-docuflux.pdf', bytes: await outputDocument.save(), mime: pdfMime };
+  }
+
+  async split(file: File, ranges: string): Promise<ToolResult[]> {
+    const sourceDocument = await PDFDocument.load(await bytesFromFile(file), { ignoreEncryption: true });
+    const totalPages = sourceDocument.getPageCount();
+    const rangeGroups = ranges.split(',').map((range) => range.trim()).filter(Boolean);
+    const results: ToolResult[] = [];
+
+    for (const rangeGroup of rangeGroups) {
+      const pageIndexes = pageRangeToIndexes(rangeGroup, totalPages);
+      if (!pageIndexes.length) continue;
+
+      const outputDocument = await PDFDocument.create();
+      const copiedPages = await outputDocument.copyPages(sourceDocument, pageIndexes);
+      copiedPages.forEach((page) => outputDocument.addPage(page));
+      results.push({
+        name: withSuffix(file, `-pages-${rangeGroup.replace(/[^0-9-]/g, '-')}.pdf`),
+        bytes: await outputDocument.save(),
+        mime: pdfMime,
+      });
+    }
+
+    return results;
+  }
+
+  async removePages(file: File, pages: number[]): Promise<ToolResult> {
+    const sourceDocument = await PDFDocument.load(await bytesFromFile(file), { ignoreEncryption: true });
+    const keepIndexes = sourceDocument.getPageIndices().filter((pageIndex) => !pages.includes(pageIndex + 1));
+    const outputDocument = await PDFDocument.create();
+    const copiedPages = await outputDocument.copyPages(sourceDocument, keepIndexes);
+    copiedPages.forEach((page) => outputDocument.addPage(page));
+
+    return { name: withSuffix(file, '-removed-pages.pdf'), bytes: await outputDocument.save(), mime: pdfMime };
+  }
+
+  async rotatePages(file: File, pages: number[], rotationDegrees: number): Promise<ToolResult> {
+    const document = await PDFDocument.load(await bytesFromFile(file), { ignoreEncryption: true });
+    document.getPages().forEach((page, index) => {
+      if (!pages.length || pages.includes(index + 1)) page.setRotation(degrees(rotationDegrees));
+    });
+
+    return { name: withSuffix(file, '-rotated.pdf'), bytes: await document.save(), mime: pdfMime };
+  }
+
+  async compress(file: File, options: { targetMb?: number; quality: number; preset: string }) {
+    const document = await PDFDocument.load(await bytesFromFile(file), { ignoreEncryption: true });
+    document.setProducer('DocuFlux PDF browser engine');
+    document.setCreator('DocuFlux PDF');
+
+    const saved = await document.save({ useObjectStreams: true, addDefaultPage: false });
+    const targetBytes = (options.targetMb || 0) * 1024 * 1024;
+    const message =
+      targetBytes && file.size < targetBytes
+        ? 'This PDF is already under your selected size. Browser compression optimized metadata/resources where possible.'
+        : undefined;
+
+    return {
+      name: withSuffix(file, '-compressed.pdf'),
+      bytes: saved,
+      mime: pdfMime,
+      originalSize: file.size,
+      finalSize: saved.byteLength,
+      message,
+    };
+  }
+
+  async imagesToPdf(files: File[]): Promise<ToolResult> {
+    const document = await PDFDocument.create();
+
+    for (const file of files) {
+      const imageBytes = await bytesFromFile(file);
+      const image = file.type.includes('png') ? await document.embedPng(imageBytes) : await document.embedJpg(imageBytes);
+      const page = document.addPage([image.width, image.height]);
+      page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+    }
+
+    return { name: 'images-docuflux.pdf', bytes: await document.save(), mime: pdfMime };
+  }
+
+  async pdfToImages(): Promise<ToolResult[]> {
+    throw new Error('PDF to image uses the lazy pdf.js renderer in the browser viewer.');
+  }
+
+  async textToPdf(file: File): Promise<ToolResult> {
+    const document = await PDFDocument.create();
+    const font = await document.embedFont(StandardFonts.Helvetica);
+    const text = await file.text();
+    let page = document.addPage();
+    let y = 760;
+
+    for (const line of text.split('\n')) {
+      if (y < 48) {
+        page = document.addPage();
+        y = 760;
+      }
+
+      page.drawText(line.slice(0, 100), { x: 48, y, size: 11, font, color: rgb(0.05, 0.09, 0.16) });
+      y -= 16;
+    }
+
+    return { name: withSuffix(file, '.pdf'), bytes: await document.save(), mime: pdfMime };
+  }
+
+  async read(file: File) {
+    const document = await PDFDocument.load(await bytesFromFile(file), { ignoreEncryption: true });
+
+    return {
+      title: document.getTitle() || '',
+      author: document.getAuthor() || '',
+      pageCount: document.getPageCount(),
+      fileSize: file.size,
+      encrypted: false,
+    };
+  }
+
+  async update(file: File, metadata: Record<string, string>) {
+    const document = await PDFDocument.load(await bytesFromFile(file), { ignoreEncryption: true });
+    if (metadata.title) document.setTitle(metadata.title);
+    if (metadata.author) document.setAuthor(metadata.author);
+
+    return { name: withSuffix(file, '-metadata.pdf'), bytes: await document.save(), mime: pdfMime };
+  }
+}
+
+export const browserPdfEngine = new BrowserPdfEngine();
