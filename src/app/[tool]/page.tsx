@@ -1,0 +1,4 @@
+import { notFound } from 'next/navigation';import type { Metadata } from 'next';import { ToolPage } from '@/components/tool-layout/ToolPage';import { toolBySlug, tools } from '@/lib/seo/tools';
+export function generateStaticParams(){return tools.map(t=>({tool:t.slug}))}
+export function generateMetadata({params}:{params:{tool:string}}):Metadata{const t=toolBySlug(params.tool);if(!t)return {};return {title:`${t.name} Online Free Forever`,description:`${t.description} Use DocuFlux PDF with privacy-first browser processing and no signup.`,alternates:{canonical:`/${t.slug}`},openGraph:{title:`${t.name} | DocuFlux PDF`,description:t.description,images:['/og/docuflux-og.svg']}}}
+export default function Page({params}:{params:{tool:string}}){const t=toolBySlug(params.tool);if(!t)notFound();return <ToolPage tool={t}/>}
