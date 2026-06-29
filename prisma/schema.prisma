@@ -1,0 +1,6 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+model User { id String @id @default(cuid()) email String @unique role Role @default(USER) createdAt DateTime @default(now()) preferences Json? }
+model ContactMessage { id String @id @default(cuid()) email String? message String createdAt DateTime @default(now()) }
+model ProcessingJob { id String @id @default(cuid()) tool String status String consent Boolean @default(false) deleteAfter DateTime? createdAt DateTime @default(now()) }
+enum Role { USER ADMIN }
