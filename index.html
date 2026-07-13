@@ -1,688 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universal AI Chat</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VidMateX - Video & Music Downloader</title>
+  <meta name="description" content="A responsive Android video downloader and media player landing page with format cards, app mockups, offline features, and download sections." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #22242a;
+      --muted: #5f6673;
+      --line: #e8edf0;
+      --paper: #fffdfa;
+      --cream: #f7f4ee;
+      --mint: #5fe0b3;
+      --green: #2fc95c;
+      --lime: #9be051;
+      --red: #f43f46;
+      --blue: #eaf5ff;
+      --shadow: 0 22px 60px rgba(24, 37, 56, .12);
+      --soft-shadow: 0 14px 36px rgba(39, 63, 84, .1);
+    }
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        gray: {
-                            850: '#1f2937',
-                            900: '#111827',
-                            950: '#030712',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img, svg { max-width: 100%; }
+    .container { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 253, 250, .86);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(232, 237, 240, .8);
+    }
+    nav { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 1.35rem; letter-spacing: -.04em; }
+    .brand-mark { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(145deg, var(--green), var(--lime)); display: grid; place-items: center; color: white; box-shadow: 0 10px 26px rgba(47,201,92,.32); }
+    .nav-links { display: flex; gap: 24px; color: var(--muted); font-weight: 700; font-size: .94rem; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 999px; padding: 14px 22px; font-weight: 800; cursor: pointer; transition: transform .2s, box-shadow .2s, background .2s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--red); color: #fff; box-shadow: 0 16px 34px rgba(244,63,70,.28); }
+    .btn-green { background: linear-gradient(145deg, var(--green), var(--lime)); color: white; box-shadow: 0 16px 34px rgba(47,201,92,.28); }
 
-    <style>
-        /* Base Resets for Mobile-First App */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overscroll-behavior-y: none;
-        }
+    .hero { position: relative; padding: 72px 0 92px; background: radial-gradient(circle at 85% 20%, #e3ffe9 0 18%, transparent 34%), linear-gradient(180deg, #fffdfa 0%, #f7f4ee 100%); overflow: hidden; }
+    .hero::before, .hero::after { content: ""; position: absolute; border-radius: 999px; z-index: 0; }
+    .hero::before { width: 420px; height: 420px; background: rgba(47,201,92,.16); left: -170px; bottom: -130px; }
+    .hero::after { width: 260px; height: 260px; background: rgba(244,63,70,.11); right: -70px; bottom: 45px; }
+    .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.02fr .98fr; align-items: center; gap: 58px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #fff; box-shadow: var(--soft-shadow); color: var(--green); font-weight: 900; margin-bottom: 20px; }
+    h1, h2, h3 { margin: 0; line-height: 1.06; }
+    h1 { font-size: clamp(2.7rem, 7vw, 5.6rem); letter-spacing: -.075em; font-weight: 900; }
+    h1 span, .accent { color: var(--green); }
+    .lead { margin: 24px 0 30px; font-size: clamp(1.05rem, 1.7vw, 1.26rem); line-height: 1.75; color: var(--muted); max-width: 650px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+    .hero-note { color: var(--muted); font-weight: 700; }
 
-        /* Fallback Loader Styles */
-        #loading {
-            position: fixed;
-            inset: 0;
-            background: #ffffff;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.25rem;
-            font-family: system-ui, -apple-system, sans-serif;
-            color: #374151;
-            transition: opacity 0.3s ease;
-        }
-        html.dark #loading {
-            background: #111827;
-            color: #f3f4f6;
-        }
+    .phone-stage { position: relative; min-height: 650px; display: grid; place-items: center; }
+    .phone {
+      width: min(330px, 82vw); height: 640px; border: 10px solid #26303a; border-radius: 44px; background: #fff; box-shadow: var(--shadow); overflow: hidden; position: relative;
+    }
+    .speaker { position: absolute; top: 13px; left: 50%; transform: translateX(-50%); width: 88px; height: 7px; border-radius: 99px; background: #151a20; z-index: 5; opacity: .7; }
+    .screen-top { height: 138px; background: linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)), linear-gradient(135deg, #20313f, #091015); position: relative; display: grid; place-items: center; color: #fff; }
+    .play { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.2); display:grid; place-items:center; }
+    .video-info { display: grid; grid-template-columns: 96px 1fr; gap: 12px; padding: 14px; align-items: start; border-bottom: 1px solid var(--line); }
+    .thumb { border-radius: 6px; height: 58px; background: linear-gradient(135deg, #16b8d8, #fde047); display:grid; place-items:center; color:#fff; font-weight:900; font-size:1.1rem; position: relative; overflow: hidden; }
+    .thumb::after { content:"04:29"; position:absolute; right:4px; bottom:4px; font-size:.62rem; background:#0008; padding:2px 4px; border-radius:3px; }
+    .video-info strong { display: block; font-size: .82rem; line-height: 1.4; }
+    .path { padding: 0 14px 10px; font-size:.68rem; color:#69717e; border-bottom:1px solid var(--line); }
+    .path span { float:right; color:#0ea5e9; font-weight:800; }
+    .list-title { display:flex; align-items:center; gap:10px; padding: 12px 16px 4px; font-weight:900; }
+    .list-title i { color: var(--red); }
+    .format-row { display:grid; grid-template-columns: 30px 1fr 58px 65px; align-items:center; gap:8px; padding: 10px 16px; font-size:.84rem; border-bottom:1px solid #f1f4f5; color:#737b86; }
+    .format-row b { color:#28313a; }
+    .radio { width:17px; height:17px; border-radius:50%; border:2px solid #c8ced4; }
+    .format-row.active { color: var(--red); }
+    .format-row.active .radio { border:5px solid var(--red); }
+    .format-row.active b { color: var(--red); }
+    .download-bar { position:absolute; left:0; right:0; bottom:0; height:54px; background:var(--red); color:#fff; display:grid; place-items:center; font-weight:800; }
+    .magnifier { position:absolute; left:-42px; top:155px; width:240px; height:240px; border:5px solid #ff5a5f; border-radius:50%; background:#fff; box-shadow: 0 12px 34px rgba(244,63,70,.28); display:flex; flex-direction:column; justify-content:center; padding: 18px 34px; transform: rotate(-2deg); }
+    .magnifier .format-row { padding: 8px 0; grid-template-columns: 28px 1fr 45px; border:0; font-size:.9rem; }
+    .magnifier h4 { margin:0 0 8px; display:flex; gap:10px; align-items:center; }
 
-        /* App Container setup */
-        #app {
-            display: none; /* Hidden until JS loads */
-        }
+    section { padding: 82px 0; }
+    .section-title { text-align:center; max-width: 850px; margin: 0 auto 46px; }
+    h2 { font-family: "Playfair Display", Georgia, serif; font-size: clamp(2.1rem, 4vw, 3.25rem); letter-spacing: -.025em; }
+    .section-title p, .copy p { color: var(--muted); line-height:1.75; font-size:1.05rem; }
+    .cream { background: var(--cream); }
+    .blue { background: linear-gradient(180deg, #eff8ff, #ffffff); }
+    .pink { background: #fff0f0; }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        html.dark ::-webkit-scrollbar-thumb {
-            background: #475569;
-        }
+    .copy { max-width: 1080px; }
+    .copy h3 { font-family: "Playfair Display", Georgia, serif; font-size: 1.85rem; margin: 28px 0 10px; }
+    .bullets { display:grid; gap:12px; margin: 18px 0; padding:0; list-style:none; }
+    .bullets li { display:flex; gap:12px; align-items:flex-start; color:#3f4650; line-height:1.6; }
+    .bullets i, .dot { color:#0ea5e9; margin-top:4px; }
 
-        /* Markdown Custom Styles */
-        .markdown-body {
-            font-family: inherit;
-            line-height: 1.6;
-            word-wrap: break-word;
-        }
-        .markdown-body p { margin-bottom: 0.75em; }
-        .markdown-body p:last-child { margin-bottom: 0; }
-        .markdown-body pre {
-            background-color: #1e293b;
-            color: #f8fafc;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            margin: 0.75rem 0;
-        }
-        html.dark .markdown-body pre { background-color: #0f172a; border: 1px solid #1e293b; }
-        .markdown-body code {
-            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-            font-size: 0.875em;
-        }
-        .markdown-body :not(pre) > code {
-            background-color: rgba(148, 163, 184, 0.2);
-            padding: 0.15rem 0.3rem;
-            border-radius: 0.25rem;
-        }
-        .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body a { color: #3b82f6; text-decoration: underline; }
+    .cards { display:grid; grid-template-columns: repeat(3, 1fr); gap:28px; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:38px 28px; text-align:center; min-height:268px; box-shadow: var(--soft-shadow); transition: transform .2s; }
+    .card:hover { transform: translateY(-5px); }
+    .icon-tile { width:86px; height:86px; margin:0 auto 28px; border-radius:22px; display:grid; place-items:center; background:linear-gradient(145deg,var(--green),var(--lime)); color:#fff; font-size:2.2rem; }
+    .card h3 { font-family:"Playfair Display", Georgia, serif; font-size:1.5rem; margin-bottom:12px; }
+    .card p { color:#4d5662; line-height:1.55; margin:0; }
 
-        /* Typing Animation */
-        .typing-indicator span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background-color: #9ca3af;
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-    </style>
+    .feature-showcase { display:grid; grid-template-columns: .95fr 1.05fr; align-items:center; gap:70px; }
+    .landscape-phone { border:9px solid #f5fbff; outline:4px solid #ddebf2; border-radius:44px; padding:18px; background:#fff; box-shadow:var(--shadow); transform: rotate(.5deg); }
+    .player { aspect-ratio: 16/9; border-radius:26px; overflow:hidden; background: linear-gradient(135deg,#d946ef,#10b981); position:relative; display:grid; place-items:center; }
+    .player::before { content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent 0 58%,rgba(0,0,0,.55) 58%); }
+    .player .pause { z-index:1; color:#fff; font-size:3rem; }
+    .player-menu { position:absolute; right:20px; top:18px; z-index:2; display:grid; grid-template-columns: repeat(4, 56px); gap:16px; color:#fff; text-align:center; font-size:.7rem; }
+    .player-menu i { display:block; font-size:1.2rem; margin-bottom:5px; }
+    .feature-list { display:grid; grid-template-columns:1fr 1fr; gap:24px 36px; margin-top:30px; }
+    .feature-list div { display:flex; gap:18px; align-items:center; font-family:"Playfair Display", Georgia, serif; font-weight:800; font-size:1.5rem; color:#55515c; }
+    .feature-list .dot { width:24px; height:24px; border-radius:50%; background:var(--mint); flex:0 0 auto; }
+
+    .music-grid { display:grid; grid-template-columns: 430px 1fr; align-items:center; gap:80px; }
+    .music-phone { height:660px; border:9px solid #eaf6fb; border-radius:42px; background:linear-gradient(180deg,#172112,#050607 72%); overflow:hidden; box-shadow: var(--shadow); position:relative; color:#fff; padding:34px; }
+    .lyrics { text-align:center; margin-top:65px; color:rgba(255,255,255,.55); line-height:2.1; font-weight:700; }
+    .equalizer { position:absolute; left:34px; right:34px; bottom:160px; height:110px; display:flex; align-items:end; gap:7px; }
+    .bar { flex:1; background:linear-gradient(#33f5a4,#0f8d56); min-height:12px; opacity:.9; }
+    .music-controls { position:absolute; left:0; right:0; bottom:0; height:150px; background:#08090b; padding:22px 30px; }
+    .progress { height:4px; background:#333; border-radius:99px; margin-bottom:34px; position:relative; }
+    .progress::before { content:""; position:absolute; inset:0 75% 0 0; background:#16c979; border-radius:inherit; }
+    .controls { display:flex; align-items:center; justify-content:space-between; font-size:1.4rem; }
+    .controls .big { width:64px; height:64px; border-radius:50%; background:#f3f4f6; color:#111; display:grid; place-items:center; }
+    .music-points { display:grid; gap:32px; }
+    .music-points li { list-style:none; display:flex; gap:24px; align-items:center; font-family:"Playfair Display", Georgia, serif; font-size:1.55rem; font-weight:800; color:#55515c; }
+    .music-points .dot { width:24px; height:24px; background:var(--mint); border-radius:50%; flex:0 0 auto; }
+
+    .offline-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:44px 80px; text-align:center; }
+    .offline-item .outline-icon { width:128px; height:128px; border-radius:34px; background:#f5f5f5; display:grid; place-items:center; margin:0 auto 22px; color:#333; font-size:3.2rem; }
+    .offline-item h3 { font-family:"Playfair Display", Georgia, serif; font-size:1.2rem; margin-bottom:14px; }
+    .offline-item p { color:#000; line-height:1.55; max-width:430px; margin:0 auto; }
+
+    .app-gallery { display:grid; grid-template-columns: repeat(3, 1fr); gap:28px; }
+    .poster { background:#eaf5ff; border-radius:22px; padding:28px; min-height:420px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:var(--soft-shadow); }
+    .poster h3 { font-size:1.8rem; letter-spacing:-.04em; }
+    .poster-screen { border:8px solid #22031f; border-radius:24px; background:#fff; height:300px; padding:18px; overflow:hidden; }
+    .folder { height:34px; background:#edf1f4; border-radius:7px; margin:11px 0; }
+    .poster.dark .poster-screen { background:#111; color:#fff; display:grid; place-items:center; }
+    .disc { width:130px; height:130px; border-radius:50%; background:radial-gradient(circle,#7dd3fc 0 18%,#222 19% 100%); box-shadow:0 0 0 18px #0005; }
+    .quality-badges { display:grid; gap:10px; justify-content:end; margin-top:14px; }
+    .quality-badges span { background:#f8c65b; border-radius:7px; padding:8px 12px; font-weight:900; text-align:center; }
+
+    footer { padding:42px 0; background:#101418; color:#cbd5df; text-align:center; }
+
+    @media (max-width: 900px) {
+      .nav-links { display:none; }
+      .hero-grid, .feature-showcase, .music-grid { grid-template-columns:1fr; }
+      .phone-stage { min-height: 610px; }
+      .cards, .app-gallery { grid-template-columns:1fr 1fr; }
+      .music-grid { gap:34px; }
+      .music-phone { width:min(430px,100%); margin:auto; }
+    }
+    @media (max-width: 620px) {
+      .container { width: min(100% - 26px, 1180px); }
+      nav { min-height:66px; }
+      .brand { font-size:1.1rem; }
+      .hero { padding:46px 0 66px; }
+      .hero-actions { align-items:stretch; flex-direction:column; }
+      .btn { width:100%; }
+      .phone { height:585px; }
+      .magnifier { left:-8px; top:170px; width:205px; height:205px; padding:15px 25px; }
+      .cards, .app-gallery, .offline-grid, .feature-list { grid-template-columns:1fr; }
+      section { padding:58px 0; }
+      .player-menu { display:none; }
+      .music-points { padding:0; }
+      .music-points li, .feature-list div { font-size:1.25rem; }
+    }
+  </style>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-colors duration-200">
+<body>
+  <header>
+    <nav class="container" aria-label="Primary navigation">
+      <a class="brand" href="#top"><span class="brand-mark"><i class="fa-solid fa-play"></i></span> VidMateX</a>
+      <div class="nav-links">
+        <a href="#downloads">Downloads</a>
+        <a href="#features">Features</a>
+        <a href="#player">Player</a>
+        <a href="#offline">Offline</a>
+      </div>
+      <a class="btn btn-green" href="#download"><i class="fa-brands fa-android"></i> Get APK</a>
+    </nav>
+  </header>
 
-    <div id="loading">
-        <div class="flex flex-col items-center gap-4">
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
-            <div>Loading App...</div>
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Fast Android media downloader</div>
+          <h1>Download <span>video</span> & music in every format.</h1>
+          <p class="lead">Paste a link, pick MP4, MP3, HD, 4K, or 8K, and save media for offline playback. This responsive landing page recreates the downloader, file manager, floating player, and music player experience shown in your reference screens.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#download"><i class="fa-solid fa-download"></i> Download App</a>
+            <a class="btn" style="background:#fff; box-shadow:var(--soft-shadow)" href="#features"><i class="fa-solid fa-circle-play"></i> Explore Features</a>
+            <span class="hero-note">No login. No waiting. Unlimited saves.</span>
+          </div>
         </div>
-    </div>
-
-    <div id="app" class="flex min-h-[100dvh] w-full relative">
-        
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
-
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-gray-50 dark:bg-gray-850 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 flex flex-col h-[100dvh]">
-            <div class="p-4 flex items-center justify-between">
-                <button id="btn-new-chat" class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-sm text-sm font-medium">
-                    <i class="fa-solid fa-plus"></i> New Chat
-                </button>
-                <button id="btn-close-sidebar" class="md:hidden ml-2 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1" id="chat-list">
-                </div>
-
-            <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
-                <button id="btn-theme" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-sm font-medium transition-colors">
-                    <i class="fa-solid fa-moon w-5 text-center" id="theme-icon"></i>
-                    <span id="theme-text">Dark Mode</span>
-                </button>
-                <button id="btn-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-sm font-medium transition-colors">
-                    <i class="fa-solid fa-gear w-5 text-center"></i>
-                    <span>Settings</span>
-                </button>
-            </div>
-        </aside>
-
-        <main class="flex-1 flex flex-col min-w-0 h-[100dvh] relative bg-white dark:bg-gray-900">
-            <header class="flex items-center justify-between p-4 sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-10 border-b border-transparent">
-                <div class="flex items-center gap-3">
-                    <button id="btn-menu" class="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
-                    <h1 class="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Universal AI</h1>
-                </div>
-                <div class="text-xs font-medium px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md text-gray-500" id="current-model-display">
-                    deepseek-r1:free
-                </div>
-            </header>
-
-            <div id="messages-container" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-6 pb-40 scroll-smooth">
-                </div>
-
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent dark:from-gray-900 dark:via-gray-900 pt-8 pb-4 px-4 md:px-8 z-20">
-                <div class="max-w-4xl mx-auto relative">
-                    <form id="chat-form" class="relative flex items-end gap-2 bg-gray-50 dark:bg-gray-850 rounded-[1.5rem] p-2 border border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 shadow-sm transition-all">
-                        <textarea id="message-input" rows="1" class="w-full max-h-48 resize-none bg-transparent border-none outline-none py-3 px-4 text-gray-800 dark:text-gray-100 placeholder-gray-500" placeholder="Message AI..."></textarea>
-                        <button type="submit" id="btn-send" class="p-3 m-1 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 flex items-center justify-center w-12 h-12 shadow-md">
-                            <i class="fa-solid fa-arrow-up text-lg"></i>
-                        </button>
-                    </form>
-                    <div class="text-center mt-2 text-xs text-gray-400 dark:text-gray-500 px-4">
-                        AI can make mistakes. Verify critical information.
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div id="modal-settings" class="fixed inset-0 z-[100] hidden items-center justify-center">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="modal-backdrop"></div>
-        <div class="relative bg-white dark:bg-gray-850 rounded-2xl shadow-2xl w-11/12 max-w-lg p-6 border border-gray-200 dark:border-gray-700 flex flex-col gap-5 transform scale-95 transition-transform duration-200" id="modal-content">
-            <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 pb-3">
-                <h2 class="text-xl font-semibold">Settings</h2>
-                <button id="btn-close-modal-x" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">OpenRouter API Key <span class="text-red-500">*</span></label>
-                    <input type="password" id="input-api-key" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-shadow" placeholder="sk-or-v1-...">
-                    <p class="text-xs text-gray-500 mt-1">Stored locally in your browser.</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Model Name</label>
-                    <input type="text" id="input-model" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-shadow" value="deepseek/deepseek-r1:free">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Global System Prompt</label>
-                    <textarea id="input-system" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none h-24 transition-shadow" placeholder="You are a helpful, brilliant AI assistant..."></textarea>
-                </div>
-            </div>
-            
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                <button id="btn-close-settings" class="px-5 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 font-medium text-gray-700 dark:text-gray-300 transition-colors">Cancel</button>
-                <button id="btn-save-settings" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow-md transition-colors">Save Changes</button>
-            </div>
+        <div class="phone-stage" aria-label="Download options mockup">
+          <div class="phone">
+            <div class="speaker"></div>
+            <div class="screen-top"><div class="play"><i class="fa-solid fa-play"></i></div></div>
+            <div class="video-info"><div class="thumb">8K HDR</div><strong>High Quality Aerial Video 8K HDR 60FPS (FUHD)</strong></div>
+            <div class="path">Path:/storage/emulated/0/VidMate/download/ <span>CHANGE</span></div>
+            <div class="list-title"><i class="fa-solid fa-music"></i> Music</div>
+            <div class="format-row"><span class="radio"></span><b>128K</b><span>M4A</span><span>4.35 MB</span></div>
+            <div class="format-row"><span class="radio"></span><b>128K</b><span>MP3</span><span>4.35 MB</span></div>
+            <div class="format-row active"><span class="radio"></span><b>48K</b><span>MP3</span><span>1.94 MB</span></div>
+            <div class="format-row"><span class="radio"></span><b>256K</b><span>MP3</span><span>2.50 MB</span></div>
+            <div class="list-title"><i class="fa-brands fa-youtube"></i> Video</div>
+            <div class="format-row"><span class="radio"></span><b>144P</b><span>MP4</span><span>6.47 MB</span></div>
+            <div class="format-row"><span class="radio"></span><b>720P HD</b><span>MP4</span><span>63.65 MB</span></div>
+            <div class="format-row active"><span class="radio"></span><b>8K HD</b><span>WebM</span><span>852 MB</span></div>
+            <div class="download-bar"><i class="fa-solid fa-arrow-down"></i>&nbsp; Download</div>
+          </div>
+          <div class="magnifier" aria-hidden="true">
+            <h4><i class="fa-solid fa-music" style="color:var(--red)"></i> Music</h4>
+            <div class="format-row"><span class="radio"></span><b>128K</b><span>M4A</span></div>
+            <div class="format-row"><span class="radio"></span><b>128K</b><span>MP3</span></div>
+            <div class="format-row active"><span class="radio"></span><b>48K</b><span>MP3</span></div>
+            <div class="format-row"><span class="radio"></span><b>256K</b><span>MP3</span></div>
+          </div>
         </div>
-    </div>
+      </div>
+    </section>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // --- DEPENDENCY CONFIGURATION ---
-            marked.setOptions({ breaks: true, gfm: true });
+    <section class="cream" id="downloads">
+      <div class="container copy">
+        <h2>Online Video & Music Downloader That Works on Any Android Device</h2>
+        <p>No matter what Android device you are using—phone or tablet—VidMateX makes saving videos simple and smooth. Install the APK to start downloading instantly.</p>
+        <h3>What You Can Do:</h3>
+        <ul class="bullets">
+          <li><i class="fa-solid fa-circle-dot"></i> Paste any YouTube, Facebook, Instagram, TikTok, or web video link.</li>
+          <li><i class="fa-solid fa-circle-dot"></i> Choose your format: MP4, MP3, HD, 4K, or 8K.</li>
+          <li><i class="fa-solid fa-circle-dot"></i> Hit download and enjoy offline access instantly.</li>
+        </ul>
+        <h3>Use it your way:</h3>
+        <ul class="bullets">
+          <li><i class="fa-solid fa-circle-dot"></i> Download with the Android app.</li>
+          <li><i class="fa-solid fa-circle-dot"></i> No setup, no subscription—just fast and free access on your Android device.</li>
+        </ul>
+      </div>
+    </section>
 
-            // --- STATE MANAGEMENT ---
-            const defaultSettings = {
-                apiKey: '',
-                model: 'deepseek/deepseek-r1:free',
-                systemPrompt: 'You are a helpful, smart, and concise AI assistant.',
-                theme: 'light'
-            };
+    <section>
+      <div class="container copy">
+        <div class="section-title"><h2>Instant & Unlimited Downloads – No Login Needed</h2></div>
+        <p>Tired of slow tools, forced signups, and daily limits? VidMateX gives you a fast video downloader that is always free, always unlimited, and never asks for your personal details.</p>
+        <h3>Instant Downloads</h3><p>Paste the video or music URL, select MP4 or MP3, and tap download. Files are processed and saved within seconds for high-resolution videos.</p>
+        <h3>Unlimited Access</h3><p>There is no cap on how many files you can download. Use it as your go-to music downloader, MP3 converter, or HD video downloader as often as you want.</p>
+        <h3>No Login Required</h3><p>No signup forms. No email verification. No annoying pop-ups. You just get what you came for.</p>
+        <h3>No Hidden Costs or Subscriptions</h3><p>All download options—from 360p to 8K—are available to everyone without trials or in-app purchases.</p>
+      </div>
+    </section>
 
-            let settings = { ...defaultSettings };
-            let chats = [];
-            let currentChatId = null;
-            let isGenerating = false;
+    <section class="cream" id="features">
+      <div class="container">
+        <div class="section-title"><h2>Powerful Media Tools in One App</h2><p>Feature cards inspired by your screenshots, built as clean responsive UI elements.</p></div>
+        <div class="cards">
+          <article class="card"><div class="icon-tile"><i class="fa-solid fa-file-video"></i></div><h3>All format supported</h3><p>Music: WAV, MP3, AAC. Video: 4K, 1080p, MKV, FLV, 3GP, M4V, TS, MPG.</p></article>
+          <article class="card"><div class="icon-tile"><i class="fa-solid fa-folder-gear"></i></div><h3>Auto manage local files</h3><p>Identify video files on Android devices and SD cards, then sort and share media files.</p></article>
+          <article class="card"><div class="icon-tile"><i class="fa-solid fa-magnifying-glass-play"></i></div><h3>Search online videos</h3><p>Built-in search and streaming tools help you discover media fast.</p></article>
+          <article class="card"><div class="icon-tile"><i class="fa-solid fa-headphones"></i></div><h3>Floating & background play</h3><p>Keep videos or audio playing while chatting, browsing, or using other apps.</p></article>
+          <article class="card"><div class="icon-tile"><i class="fa-solid fa-right-left"></i></div><h3>MP4 to MP3</h3><p>Convert videos to audio files and keep your favorite tracks on your device.</p></article>
+          <article class="card"><div class="icon-tile"><i class="fa-solid fa-hand-pointer"></i></div><h3>Smart gesture control</h3><p>One-click controls for brightness, speed, volume, zoom, and playback.</p></article>
+        </div>
+      </div>
+    </section>
 
-            // --- DOM ELEMENTS ---
-            const els = {
-                app: document.getElementById('app'),
-                loading: document.getElementById('loading'),
-                sidebar: document.getElementById('sidebar'),
-                sidebarOverlay: document.getElementById('sidebar-overlay'),
-                chatList: document.getElementById('chat-list'),
-                messagesContainer: document.getElementById('messages-container'),
-                chatForm: document.getElementById('chat-form'),
-                messageInput: document.getElementById('message-input'),
-                btnSend: document.getElementById('btn-send'),
-                btnNewChat: document.getElementById('btn-new-chat'),
-                btnMenu: document.getElementById('btn-menu'),
-                btnCloseSidebar: document.getElementById('btn-close-sidebar'),
-                btnTheme: document.getElementById('btn-theme'),
-                themeIcon: document.getElementById('theme-icon'),
-                themeText: document.getElementById('theme-text'),
-                btnSettings: document.getElementById('btn-settings'),
-                modalSettings: document.getElementById('modal-settings'),
-                modalContent: document.getElementById('modal-content'),
-                modalBackdrop: document.getElementById('modal-backdrop'),
-                btnCloseSettings: document.getElementById('btn-close-settings'),
-                btnCloseModalX: document.getElementById('btn-close-modal-x'),
-                btnSaveSettings: document.getElementById('btn-save-settings'),
-                inputApiKey: document.getElementById('input-api-key'),
-                inputModel: document.getElementById('input-model'),
-                inputSystem: document.getElementById('input-system'),
-                currentModelDisplay: document.getElementById('current-model-display')
-            };
+    <section class="blue" id="player">
+      <div class="container feature-showcase">
+        <div>
+          <div class="landscape-phone"><div class="player"><div class="pause"><i class="fa-solid fa-pause"></i></div><div class="player-menu"><span><i class="fa-solid fa-rotate"></i>Loop</span><span><i class="fa-regular fa-closed-captioning"></i>Subtitle</span><span><i class="fa-regular fa-star"></i>Favorite</span><span><i class="fa-solid fa-music"></i>Audio</span><span><i class="fa-solid fa-scissors"></i>Cut</span><span><i class="fa-solid fa-repeat"></i>Repeat</span><span><i class="fa-solid fa-share"></i>Share</span><span><i class="fa-solid fa-circle-info"></i>Info</span></div></div></div>
+        </div>
+        <div>
+          <h2>Ultra HD Video Player Supports All Formats</h2>
+          <p class="lead">A rich playback screen for HD, 4K, and 8K content with gestures, background play, subtitle controls, and audio-track switching.</p>
+          <div class="feature-list"><div><span class="dot"></span>Background play</div><div><span class="dot"></span>Convert MP4 to MP3</div><div><span class="dot"></span>Floating play</div><div><span class="dot"></span>Adjust playback speed</div></div>
+        </div>
+      </div>
+    </section>
 
-            // --- INITIALIZATION ---
-            function init() {
-                loadData();
-                applyTheme(settings.theme);
-                renderSidebar();
-                
-                if (chats.length > 0) {
-                    selectChat(chats[0].id);
-                } else {
-                    renderMessages(); // Shows welcome screen
-                }
+    <section>
+      <div class="container music-grid">
+        <div class="music-phone">
+          <strong>En Veetu Thottathil</strong>
+          <div class="lyrics">En Veetu Thottathil Poovellam Kaetuppaar<br>En Veetu Jannal Kambi Ellaamae Kaetuppaar<br>En Nenjai Sollumae</div>
+          <div class="equalizer" aria-hidden="true"></div>
+          <div class="music-controls"><div class="progress"></div><div class="controls"><i class="fa-solid fa-shuffle"></i><i class="fa-solid fa-backward-step"></i><span class="big"><i class="fa-solid fa-play"></i></span><i class="fa-solid fa-forward-step"></i><i class="fa-solid fa-list"></i></div></div>
+        </div>
+        <div>
+          <h2>Best Music Player</h2>
+          <ul class="music-points">
+            <li><span class="dot"></span>Locate and manage all music files</li>
+            <li><span class="dot"></span>Music player with lyrics support</li>
+            <li><span class="dot"></span>Intelligent sleep timer</li>
+            <li><span class="dot"></span>Automatically pause playback when your headset is unplugged</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-                setupEventListeners();
+    <section class="pink" id="offline">
+      <div class="container">
+        <div class="section-title"><h2>No Internet? No Problem. Save for Offline Use</h2><p>Download music and video so you can enjoy them anytime—no Wi‑Fi, no buffering, no limits.</p></div>
+        <div class="offline-grid">
+          <article class="offline-item"><div class="outline-icon"><i class="fa-solid fa-layer-group"></i></div><h3>HD & MP4 Video Downloader</h3><p>Download videos in multiple formats, including MP4, HD, and even 4K for high quality offline viewing.</p></article>
+          <article class="offline-item"><div class="outline-icon"><i class="fa-regular fa-file-audio"></i></div><h3>MP3 Music Downloads</h3><p>Convert videos to high-quality MP3 files with just a tap and keep songs or podcasts on your phone.</p></article>
+          <article class="offline-item"><div class="outline-icon"><i class="fa-solid fa-bolt"></i></div><h3>Blazing-Fast Speed</h3><p>Optimized UI and focused download choices keep the process quick and simple.</p></article>
+          <article class="offline-item"><div class="outline-icon"><i class="fa-regular fa-circle-play"></i></div><h3>Use Anywhere: Android & Web</h3><p>A responsive layout that looks strong on phones, tablets, laptops, and desktop screens.</p></article>
+        </div>
+      </div>
+    </section>
 
-                // Hide loader and show app safely
-                els.loading.style.opacity = '0';
-                setTimeout(() => {
-                    els.loading.style.display = 'none';
-                    els.app.style.display = 'flex';
-                }, 300);
-            }
+    <section id="download" class="blue">
+      <div class="container">
+        <div class="section-title"><h2>App Screens Built From Your References</h2><p>Media manager, music player, and ultra-HD player mockups are included for a complete app showcase.</p></div>
+        <div class="app-gallery">
+          <article class="poster"><h3>Media Manager</h3><div class="poster-screen"><strong>Folders</strong><div class="folder"></div><div class="folder"></div><div class="folder"></div><div class="folder"></div><div class="folder"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px"><div class="thumb"></div><div class="thumb"></div></div></div></article>
+          <article class="poster dark"><h3>Music Player</h3><div class="poster-screen"><div class="disc"></div><p>Happy Birthday to You</p><i class="fa-solid fa-pause" style="font-size:2rem"></i></div></article>
+          <article class="poster"><h3>Gesture Control</h3><div class="poster-screen" style="background:linear-gradient(135deg,#111,#607d8b);color:#fff;display:grid;place-items:center;text-align:center"><h3>Brightness • Speed • Volume<br>Zoom and pan</h3><i class="fa-solid fa-hand-pointer" style="font-size:4rem"></i></div><div class="quality-badges"><span>8K ULTRAHD</span><span>4K ULTRAHD</span><span>FHD FULLHD</span></div></article>
+        </div>
+      </div>
+    </section>
+  </main>
 
-            // --- LOCAL STORAGE ---
-            function loadData() {
-                try {
-                    const savedSettings = localStorage.getItem('ai_settings');
-                    if (savedSettings) settings = { ...settings, ...JSON.parse(savedSettings) };
-                    
-                    const savedChats = localStorage.getItem('ai_chats');
-                    if (savedChats) chats = JSON.parse(savedChats);
-                } catch (e) {
-                    console.error("Error loading data", e);
-                }
-                els.currentModelDisplay.innerText = settings.model.split('/').pop();
-            }
+  <footer>
+    <div class="container">© 2026 VidMateX concept landing page. Designed as a static responsive prototype.</div>
+  </footer>
 
-            function saveData() {
-                try {
-                    localStorage.setItem('ai_settings', JSON.stringify(settings));
-                    localStorage.setItem('ai_chats', JSON.stringify(chats));
-                } catch (e) {
-                    console.error("Error saving data", e);
-                }
-            }
-
-            // --- THEME MANAGEMENT ---
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    els.themeIcon.classList.replace('fa-moon', 'fa-sun');
-                    els.themeText.innerText = 'Light Mode';
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    els.themeIcon.classList.replace('fa-sun', 'fa-moon');
-                    els.themeText.innerText = 'Dark Mode';
-                }
-            }
-
-            function toggleTheme() {
-                settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
-                applyTheme(settings.theme);
-                saveData();
-            }
-
-            // --- UI RENDERING ---
-            function renderSidebar() {
-                els.chatList.innerHTML = '';
-                chats.forEach(chat => {
-                    const isActive = chat.id === currentChatId;
-                    const div = document.createElement('div');
-                    div.className = `group relative flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-medium transition-colors ${
-                        isActive 
-                        ? 'bg-blue-100 dark:bg-gray-800 text-blue-700 dark:text-blue-400' 
-                        : 'hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
-                    }`;
-                    
-                    const titleSpan = document.createElement('span');
-                    titleSpan.className = 'flex-1 truncate';
-                    titleSpan.textContent = chat.title || 'New Chat';
-                    div.onclick = () => selectChat(chat.id);
-
-                    const actionsDiv = document.createElement('div');
-                    actionsDiv.className = `flex items-center opacity-0 group-hover:opacity-100 transition-opacity ${isActive ? 'opacity-100' : ''}`;
-                    
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'p-1.5 hover:text-blue-500 transition-colors';
-                    editBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
-                    editBtn.onclick = (e) => { e.stopPropagation(); renameChat(chat.id); };
-
-                    const delBtn = document.createElement('button');
-                    delBtn.className = 'p-1.5 hover:text-red-500 transition-colors ml-1';
-                    delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
-                    delBtn.onclick = (e) => { e.stopPropagation(); deleteChat(chat.id); };
-
-                    actionsDiv.appendChild(editBtn);
-                    actionsDiv.appendChild(delBtn);
-
-                    div.appendChild(titleSpan);
-                    div.appendChild(actionsDiv);
-                    els.chatList.appendChild(div);
-                });
-            }
-
-            function renderMessages() {
-                els.messagesContainer.innerHTML = '';
-                const activeChat = chats.find(c => c.id === currentChatId);
-
-                if (!activeChat || activeChat.messages.length === 0) {
-                    els.messagesContainer.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-full text-center space-y-6 mt-10 md:mt-24 max-w-2xl mx-auto px-4">
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 transform hover:scale-105 transition-transform">
-                                <i class="fa-solid fa-sparkles text-white text-2xl"></i>
-                            </div>
-                            <h2 class="text-3xl font-semibold bg-gradient-to-r from-gray-800 to-gray-500 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">How can I help you today?</h2>
-                            <p class="text-gray-500 dark:text-gray-400">Enter a message below to start chatting with ${settings.model.split('/').pop()}.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'max-w-3xl w-full mx-auto flex flex-col gap-6';
-
-                activeChat.messages.forEach(msg => {
-                    if (msg.role === 'system') return; // Hide system messages
-
-                    const msgDiv = document.createElement('div');
-                    if (msg.role === 'user') {
-                        msgDiv.className = 'self-end bg-blue-100 dark:bg-blue-900/50 text-gray-900 dark:text-gray-100 px-5 py-3.5 rounded-3xl rounded-br-sm max-w-[85%] md:max-w-[75%] break-words shadow-sm';
-                        msgDiv.textContent = msg.content;
-                    } else {
-                        msgDiv.className = 'self-start w-full flex gap-4 max-w-full';
-                        msgDiv.innerHTML = `
-                            <div class="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center mt-1 shadow-sm">
-                                <i class="fa-solid fa-sparkles text-white text-xs"></i>
-                            </div>
-                            <div class="flex-1 min-w-0 markdown-body text-gray-800 dark:text-gray-200 pt-1">
-                                ${DOMPurify.sanitize(marked.parse(msg.content))}
-                            </div>
-                        `;
-                    }
-                    wrapper.appendChild(msgDiv);
-                });
-                
-                els.messagesContainer.appendChild(wrapper);
-                scrollToBottom();
-            }
-
-            function scrollToBottom() {
-                els.messagesContainer.scrollTop = els.messagesContainer.scrollHeight;
-            }
-
-            // --- CHAT MANAGEMENT ---
-            function createNewChat() {
-                if (isGenerating) return;
-                const newChat = {
-                    id: Date.now().toString(),
-                    title: 'New Chat',
-                    messages: [],
-                    systemPrompt: settings.systemPrompt
-                };
-                chats.unshift(newChat);
-                currentChatId = newChat.id;
-                saveData();
-                renderSidebar();
-                renderMessages();
-                closeSidebarMobile();
-                els.messageInput.focus();
-            }
-
-            function selectChat(id) {
-                if (isGenerating) return;
-                currentChatId = id;
-                renderSidebar();
-                renderMessages();
-                closeSidebarMobile();
-            }
-
-            function deleteChat(id) {
-                if (isGenerating) return;
-                if (!confirm("Are you sure you want to delete this chat?")) return;
-                chats = chats.filter(c => c.id !== id);
-                if (currentChatId === id) {
-                    currentChatId = chats.length > 0 ? chats[0].id : null;
-                }
-                saveData();
-                renderSidebar();
-                renderMessages();
-            }
-
-            function renameChat(id) {
-                const chat = chats.find(c => c.id === id);
-                if (!chat) return;
-                const newTitle = prompt("Enter new title:", chat.title);
-                if (newTitle && newTitle.trim()) {
-                    chat.title = newTitle.trim();
-                    saveData();
-                    renderSidebar();
-                }
-            }
-
-            // --- MOBILE SIDEBAR ---
-            function openSidebarMobile() {
-                els.sidebar.classList.remove('-translate-x-full');
-                els.sidebarOverlay.classList.remove('hidden');
-            }
-
-            function closeSidebarMobile() {
-                els.sidebar.classList.add('-translate-x-full');
-                els.sidebarOverlay.classList.add('hidden');
-            }
-
-            // --- MODAL SETTINGS ---
-            function openSettings() {
-                els.inputApiKey.value = settings.apiKey;
-                els.inputModel.value = settings.model;
-                els.inputSystem.value = settings.systemPrompt;
-                els.modalSettings.classList.remove('hidden');
-                els.modalSettings.classList.add('flex');
-                setTimeout(() => els.modalContent.classList.replace('scale-95', 'scale-100'), 10);
-            }
-
-            function closeSettings() {
-                els.modalContent.classList.replace('scale-100', 'scale-95');
-                setTimeout(() => {
-                    els.modalSettings.classList.add('hidden');
-                    els.modalSettings.classList.remove('flex');
-                }, 200);
-            }
-
-            function saveSettings() {
-                settings.apiKey = els.inputApiKey.value.trim();
-                settings.model = els.inputModel.value.trim() || 'deepseek/deepseek-r1:free';
-                settings.systemPrompt = els.inputSystem.value.trim();
-                els.currentModelDisplay.innerText = settings.model.split('/').pop();
-                saveData();
-                closeSettings();
-            }
-
-            // --- AUTO-RESIZE TEXTAREA ---
-            function resizeTextarea() {
-                els.messageInput.style.height = 'auto';
-                els.messageInput.style.height = Math.min(els.messageInput.scrollHeight, 192) + 'px'; // 192px = max-h-48
-            }
-
-            // --- API INTEGRATION & STREAMING ---
-            async function sendMessage(e) {
-                if (e) e.preventDefault();
-                if (isGenerating) return;
-
-                const text = els.messageInput.value.trim();
-                if (!text) return;
-
-                if (!settings.apiKey) {
-                    alert("Please set your OpenRouter API Key in Settings first.");
-                    openSettings();
-                    return;
-                }
-
-                // Create chat if none exists
-                if (!currentChatId || chats.length === 0) {
-                    createNewChat();
-                }
-
-                const chat = chats.find(c => c.id === currentChatId);
-                if (!chat) return;
-
-                // Auto-generate title for first message
-                if (chat.messages.length === 0) {
-                    chat.title = text.length > 30 ? text.substring(0, 30) + '...' : text;
-                    renderSidebar();
-                }
-
-                // Add User Message
-                chat.messages.push({ role: 'user', content: text });
-                
-                // Reset Input UI
-                els.messageInput.value = '';
-                els.messageInput.style.height = 'auto';
-                els.btnSend.disabled = true;
-                isGenerating = true;
-                saveData();
-                renderMessages();
-
-                // Create placeholder for AI message
-                const wrapper = els.messagesContainer.querySelector('.max-w-3xl') || document.createElement('div');
-                if (!els.messagesContainer.contains(wrapper)) {
-                    wrapper.className = 'max-w-3xl w-full mx-auto flex flex-col gap-6';
-                    els.messagesContainer.innerHTML = '';
-                    els.messagesContainer.appendChild(wrapper);
-                }
-
-                const aiMsgDiv = document.createElement('div');
-                aiMsgDiv.className = 'self-start w-full flex gap-4 max-w-full';
-                aiMsgDiv.innerHTML = `
-                    <div class="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center mt-1 shadow-sm">
-                        <i class="fa-solid fa-sparkles text-white text-xs"></i>
-                    </div>
-                    <div class="flex-1 min-w-0 markdown-body text-gray-800 dark:text-gray-200 pt-1" id="stream-content">
-                        <div class="typing-indicator mt-2"><span></span><span></span><span></span></div>
-                    </div>
-                `;
-                wrapper.appendChild(aiMsgDiv);
-                scrollToBottom();
-
-                const streamContent = aiMsgDiv.querySelector('#stream-content');
-                let aiResponseText = "";
-
-                // Prepare Payload
-                const payloadMessages = [];
-                if (chat.systemPrompt) {
-                    payloadMessages.push({ role: 'system', content: chat.systemPrompt });
-                }
-                payloadMessages.push(...chat.messages);
-
-                try {
-                    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${settings.apiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: settings.model,
-                            messages: payloadMessages,
-                            stream: true
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const err = await response.json();
-                        throw new Error(err.error?.message || `HTTP Error ${response.status}`);
-                    }
-
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder("utf-8");
-                    let buffer = "";
-
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-                        
-                        buffer += decoder.decode(value, { stream: true });
-                        const lines = buffer.split('\n');
-                        buffer = lines.pop(); // Keep incomplete line in buffer
-
-                        for (const line of lines) {
-                            const trimmed = line.trim();
-                            if (!trimmed || trimmed === 'data: [DONE]') continue;
-                            
-                            if (trimmed.startsWith('data:')) {
-                                try {
-                                    const jsonStr = trimmed.slice(5).trim();
-                                    const data = JSON.parse(jsonStr);
-                                    if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
-                                        aiResponseText += data.choices[0].delta.content;
-                                        streamContent.innerHTML = DOMPurify.sanitize(marked.parse(aiResponseText));
-                                        scrollToBottom();
-                                    }
-                                } catch (e) {
-                                    // Soft fail for chunk parse errors
-                                    console.warn("SSE Parse Error", e);
-                                }
-                            }
-                        }
-                    }
-
-                } catch (error) {
-                    aiResponseText = `**Error:** ${error.message}`;
-                    streamContent.innerHTML = DOMPurify.sanitize(marked.parse(aiResponseText));
-                    streamContent.classList.add('text-red-500');
-                } finally {
-                    chat.messages.push({ role: 'assistant', content: aiResponseText });
-                    saveData();
-                    isGenerating = false;
-                    els.btnSend.disabled = false;
-                    els.messageInput.focus();
-                }
-            }
-
-            // --- EVENT LISTENERS ---
-            function setupEventListeners() {
-                els.btnTheme.addEventListener('click', toggleTheme);
-                els.btnNewChat.addEventListener('click', createNewChat);
-                els.btnMenu.addEventListener('click', openSidebarMobile);
-                els.btnCloseSidebar.addEventListener('click', closeSidebarMobile);
-                els.sidebarOverlay.addEventListener('click', closeSidebarMobile);
-                
-                // Settings Modal
-                els.btnSettings.addEventListener('click', openSettings);
-                els.btnCloseSettings.addEventListener('click', closeSettings);
-                els.btnCloseModalX.addEventListener('click', closeSettings);
-                els.modalBackdrop.addEventListener('click', closeSettings);
-                els.btnSaveSettings.addEventListener('click', saveSettings);
-
-                // Input handling
-                els.messageInput.addEventListener('input', resizeTextarea);
-                els.messageInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-                els.chatForm.addEventListener('submit', sendMessage);
-            }
-
-            // START APP
-            init();
-        });
-    </script>
+  <script>
+    const equalizer = document.querySelector('.equalizer');
+    if (equalizer) {
+      const heights = [18, 28, 44, 35, 66, 94, 47, 32, 72, 54, 24, 86, 43, 26, 58, 39, 19, 47, 31, 62, 38, 25, 48, 34, 71, 46, 20, 30, 42, 27];
+      equalizer.innerHTML = heights.map((height, index) => `<span class="bar" style="height:${height}%; animation-delay:${index * 40}ms"></span>`).join('');
+    }
+  </script>
 </body>
 </html>
